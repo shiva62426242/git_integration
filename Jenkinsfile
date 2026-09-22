@@ -39,7 +39,7 @@ pipeline {
                     TIMESTAMP=$(date +%Y%m%d-%H%M%S)
                     ARTIFACT_NAME="app-${BUILD_NUMBER}-${TIMESTAMP}.txt"
 
-                    echo "Artifact created by Jenkins" > "output/$ARTIFACT_NAME"
+                    echo "Pipeline as Code - Version 2" > "output/$ARTIFACT_NAME"
                     echo "Build Number: $BUILD_NUMBER" >> "output/$ARTIFACT_NAME"
                     echo "Build Time: $TIMESTAMP" >> "output/$ARTIFACT_NAME"
 
