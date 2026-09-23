@@ -125,33 +125,36 @@ pipeline {
 post {
     success {
         echo 'Pipeline completed successfully.'
+
         emailext(
             to: 'swethahp123@outlook.com',
             subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
             body: """
-                Jenkins build completed successfully.
+                Jenkins Pipeline completed successfully.
 
                 Job: ${env.JOB_NAME}
-                Build: ${env.BUILD_NUMBER}
+                Build Number: ${env.BUILD_NUMBER}
                 Build URL: ${env.BUILD_URL}
             """
         )
     }
 
     failure {
-        echo 'Pipeline failed. Check the console output.'
+        echo 'Pipeline failed. Sending failure notification.'
+
         emailext(
             to: 'swethahp123@outlook.com',
             subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
             body: """
-                Jenkins build failed.
+                Jenkins Pipeline failed.
 
                 Job: ${env.JOB_NAME}
-                Build: ${env.BUILD_NUMBER}
+                Build Number: ${env.BUILD_NUMBER}
                 Build URL: ${env.BUILD_URL}
 
-                Check the Jenkins console output for details.
-            """
+                Please check the console output.
+            """,
+            attachLog: true
         )
     }
 
