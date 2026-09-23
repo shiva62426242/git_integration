@@ -19,14 +19,7 @@ pipeline {
             }
         }
 
-        stage('Test Failure') {
-            steps {
-                sh '''
-                    echo "Testing Jenkins failure notification"
-                    exit 1
-                '''
-            }
-        }
+ 
 
         stage('Build Info') {
             steps {
