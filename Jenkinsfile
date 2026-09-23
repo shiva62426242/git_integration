@@ -1,5 +1,10 @@
+
 pipeline {
     agent any
+
+    options {
+        skipDefaultCheckout()
+    }
 
     environment {
         ARTIFACT_DIR = '/opt/jenkins-artifacts'
@@ -7,6 +12,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -36,7 +42,7 @@ pipeline {
                 '''
             }
         }
-        
+
         stage('Create Artifact') {
             steps {
                 sh '''
@@ -77,7 +83,10 @@ pipeline {
 
         stage('Archive Artifact') {
             steps {
-                archiveArtifacts artifacts: 'output/*.txt', fingerprint: true
+                archiveArtifacts(
+                    artifacts: 'output/*.txt',
+                    fingerprint: true
+                )
             }
         }
 
@@ -111,54 +120,44 @@ pipeline {
     }
 
     post {
+
         success {
             echo 'Pipeline completed successfully.'
+
+            emailext(
+                to: 'swethahp123@outlook.com',
+                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    Jenkins Pipeline completed successfully.
+
+                    Job: ${env.JOB_NAME}
+                    Build Number: ${env.BUILD_NUMBER}
+                    Build URL: ${env.BUILD_URL}
+                """
+            )
         }
+
         failure {
-            echo 'Pipeline failed. Check the console output.'
+            echo 'Pipeline failed. Sending failure notification.'
+
+            emailext(
+                to: 'swethahp123@outlook.com',
+                subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    Jenkins Pipeline failed.
+
+                    Job: ${env.JOB_NAME}
+                    Build Number: ${env.BUILD_NUMBER}
+                    Build URL: ${env.BUILD_URL}
+
+                    Please check the console output.
+                """,
+                attachLog: true
+            )
         }
+
         always {
             echo 'Pipeline execution finished.'
         }
-    }
-}
-post {
-    success {
-        echo 'Pipeline completed successfully.'
-
-        emailext(
-            to: 'swethahp123@outlook.com',
-            subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: """
-                Jenkins Pipeline completed successfully.
-
-                Job: ${env.JOB_NAME}
-                Build Number: ${env.BUILD_NUMBER}
-                Build URL: ${env.BUILD_URL}
-            """
-        )
-    }
-
-    failure {
-        echo 'Pipeline failed. Sending failure notification.'
-
-        emailext(
-            to: 'swethahp123@outlook.com',
-            subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: """
-                Jenkins Pipeline failed.
-
-                Job: ${env.JOB_NAME}
-                Build Number: ${env.BUILD_NUMBER}
-                Build URL: ${env.BUILD_URL}
-
-                Please check the console output.
-            """,
-            attachLog: true
-        )
-    }
-
-    always {
-        echo 'Pipeline execution finished.'
     }
 }
