@@ -5,6 +5,25 @@ pipeline {
     options {
         skipDefaultCheckout()
     }
+        parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'test', 'prod'],
+            description: 'Select the deployment environment'
+        )
+
+        string(
+            name: 'APP_VERSION',
+            defaultValue: 'v1',
+            description: 'Enter application version'
+        )
+
+        booleanParam(
+            name: 'RUN_TESTS',
+            defaultValue: true,
+            description: 'Run application tests'
+        )
+    }
 
     environment {
         ARTIFACT_DIR = '/opt/jenkins-artifacts'
@@ -18,8 +37,36 @@ pipeline {
                 checkout scm
             }
         }
+    stage('Show Parameters') {
+    steps {
+        sh '''
+            echo "=============================="
+            echo "Environment : $ENVIRONMENT"
+            echo "App Version : $APP_VERSION"
+            echo "Run Tests   : $RUN_TESTS"
+            echo "=============================="
+        '''
+    }
+}
+    stage('Test') {
+    when {
+        expression {
+            params.RUN_TESTS == true
+        }
+    }
 
- 
+    steps {
+        sh '''
+            echo "=============================="
+            echo "Running application tests..."
+            echo "Environment : $ENVIRONMENT"
+            echo "App Version : $APP_VERSION"
+            echo "=============================="
+
+            echo "Tests completed successfully."
+        '''
+    }
+}
 
         stage('Build Info') {
             steps {
